@@ -10,7 +10,7 @@
                 "-std=c++11",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/Product/${fileBasenameNoExtension}"
             ],
             "options": {
                 "cwd": "/usr/bin"
