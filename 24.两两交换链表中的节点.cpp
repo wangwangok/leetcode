@@ -29,14 +29,10 @@ public:
         ListNode *start = head->next;
         ListNode *end = head;
         ListNode *ans = head;
-        //ListNode *pivot = new ListNode(-1);
         while (start)
         {
             ListNode *end_next = start->next;
             ListNode *start_next = nullptr;
-            //pivot->next = start;
-            //pivot = pivot->next;
-            
             start->next = end;
             if (ans == head)
             {
