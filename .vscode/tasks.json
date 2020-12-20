@@ -7,8 +7,9 @@
             "command": "/usr/bin/clang++",
             "args": [
                 "-g",
-                "-std=c++11",
                 "${file}",
+                "-std=c++11",
+                "-stdlib=libc++",
                 "-o",
                 "${fileDirname}/Product/${fileBasenameNoExtension}"
             ],
