@@ -5,50 +5,52 @@ using namespace std;
 
 class Solution {
     public:
-    void swap(vector<int>& items, int lhs, int rhs) {
-        size_t size = items.size();
-        if (lhs >= size || rhs >= size)
+    vector<int> sort(vector<int> input) {
+        return partition(input, 0, input.size() - 1);
+    }
+
+private:
+    void swap(vector<int> &input, int lhs, int rhs) {
+        if (lhs >= input.size() || rhs >= input.size() || lhs == rhs)
         {
             return;
         }
-        int temp = items[lhs];
-        items[lhs] = items[rhs];
-        items[rhs] = temp;
+        input[lhs] ^= input[rhs];
+        input[rhs] ^= input[lhs];
+        input[lhs] ^= input[rhs];
     }
 
-    vector<int> quickSort(vector<int> *items, int start, int end) {
-        vector<int> results;
-        if (items->size() <= 1 || start >= end)
+    vector<int> partition(vector<int> &input, int lhs, int rhs) {
+        if (lhs >= rhs)
         {
-            return *items;
+            return input;
         }
-        results = (*items);
-        int pivot = results[start];
-        int i = start+1;
-        int j = end;
-        while (i < j)
+        int pivot = lhs;
+        int start = lhs + 1;
+        int end = rhs;
+
+        while (start < end)
         {
-            while (results[i] <= pivot)
+            while (input[start] <= input[pivot] && start < rhs)
             {
-                i++;
+                start++;
             }
-            
-            while (results[j] > pivot)
+            while (input[end] > input[pivot] && end >= lhs)
             {
-                j--;
+                end--;
             }
-            if (i < j)
+            if (start <= end)
             {
-                swap(results,i,j);
+                swap(input, start, end);
             }
         }
-        if (results[j] < pivot)
+        if (input[pivot] > input[end])
         {
-            swap(results,j,start);
+            swap(input, pivot, end);
         }
-        results = quickSort(&results,start,j-1);
-        results = quickSort(&results,j+1,end);
-        return results;
+        partition(input, lhs, end-1);
+        partition(input, end+1, rhs);
+        return input;
     }
 
     void logVector(vector<int> vec){
@@ -61,13 +63,5 @@ class Solution {
 };
 
 int main(int argc, const char* argv[]) {
-    //vector<int> items = {3,4,1,5,7,8,9}; /// c++17
-    int temp[] = {3,4,1,5,7,9,2,11};
-    vector<int> *items = new vector<int>(temp,temp+8);
-    Solution s;
-    vector<int> result = s.quickSort(items,0,items->size()-1);
-    cout<<"logout:"<<endl;
-    s.logVector(result);
-    
     return 0;
 }
