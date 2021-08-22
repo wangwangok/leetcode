@@ -8,6 +8,7 @@
             "args": [
                 "-g",
                 "${file}",
+                "${fileDirname}/nc_util.cpp",
                 "-std=c++11",
                 "-stdlib=libc++",
                 "-o",

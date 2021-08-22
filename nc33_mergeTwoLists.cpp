@@ -18,46 +18,30 @@ public:
      * @param l2 ListNode类 
      * @return ListNode类
      */
-    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+    ListNode* Merge(ListNode* pHead1, ListNode* pHead2) {
+        if (pHead1 == nullptr) return pHead2;
+        if (pHead2 == nullptr) return pHead1;
+        ListNode *lead = nullptr;
         ListNode *head = nullptr;
-        ListNode *lead = head;
-        while (l1 || l2)
-        {
-            ListNode *node;
-            if (l1 && l2)
-            {
-                if (l1->val <= l2->val)
-                {
-                    node = l1;
-                    l1 = l1->next;
-                }
-                else
-                {
-                    node = l2;
-                    l2 = l2->next;
-                }
-            }
-            else if (l1)
-            {
-                node = l1;
+        ListNode *l1 = pHead1;
+        ListNode *l2 = pHead2;
+        while (l1 != nullptr && l2 != nullptr) {
+            ListNode *temp = nullptr;
+            if (l1->val <= l2->val) {
+                temp = l1;
                 l1 = l1->next;
-            }
-            else 
-            {
-                node = l2;
+            } else {
+                temp = l2;
                 l2 = l2->next;
             }
-            if (lead == nullptr)
-            {
-                lead = node;
-                head = lead;
+            if (lead != nullptr) {
+                lead->next = temp;
             }
-            else
-            {
-                lead->next = node;
-                lead = node;
-            }
+            lead = temp;
+            if (head == nullptr) head = lead;
         }
+        if (l1 == nullptr) lead->next = l2;
+        else lead->next = l1;
         return head;
     }
 };

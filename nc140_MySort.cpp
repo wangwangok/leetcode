@@ -3,6 +3,13 @@
 
 using namespace std;
 
+/**
+ * 
+ * 给定一个数组，请你编写一个函数，返回该数组排序后的形式.
+ * 输入：[5,2,3,1,4]
+ * 输出：[1,2,3,4,5]
+ */
+
 class Solution {
 public:
     /**
@@ -46,6 +53,14 @@ private:
     }
 };
 
-int main(int argc, const char* argv[]) {
+int main(int argc, const char * argv[]) {
+    Solution s;
+    vector<int> arr = {5,1,6,2,5};
+    vector<int> result = s.MySort(arr);
+    cout<<"[";
+    for (vector<int>::iterator itr = result.begin(); itr != result.end(); ++itr) {
+        cout<<*itr<<" ";
+    }
+    cout<<"]"<<endl;
     return 0;
 }
