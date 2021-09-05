@@ -30,69 +30,94 @@ map保存key和value；其中value为双向链表的结点；
 using namespace std;
 
 class Solution {
-private:
-    struct LinklistNode {
-       LinklistNode *prev;
-       LinklistNode *next;
-       int key;
-       int value;
-       
-       LinklistNode(int k, int v):key(k) ,value(v), prev(nullptr), next(nullptr){}
+    
+    struct ListNode {
+        struct ListNode *prev;
+        struct ListNode *next;
+        int key;
+        int value;
     };
-
-    LinklistNode *head = nullptr;
-    LinklistNode *tail = nullptr;
-
-    int listCount = 0;
-
-    void insertNode(LinklistNode *node) {
-        if (node == nullptr || node == head || node == tail)
-        {
-            return;
+    
+    unordered_map<int, ListNode *> maps;
+    
+    ListNode *head = nullptr; /// 双向链表的头指针
+    ListNode *tail = nullptr; /// 双向链表的尾指针
+    int list_count = 0;
+    int list_length = 0;
+    /// list
+    bool dequeue(ListNode *node) {
+        if (node == nullptr) return false;
+        if (node == head) return true;
+        ListNode *prev = node->prev;
+        ListNode *next = node->next;
+        if (next != nullptr) {
+            next->prev = node->prev;
         }
-        listCount++;
-        node->next = head->next;
-        node->prev = head;
-        head->next->prev = node;
-        head->next = node;
+        if (prev != nullptr) {
+            prev->next = next;   
+            if (prev->next == nullptr) tail = prev;
+        }
+        return true;
     }
-
-    LinklistNode* insertValue(int key, int value) {
-        LinklistNode *node = new LinklistNode(key, value);
-        insertNode(node);
+    
+    bool toHead(ListNode *node) {
+        if (!dequeue(node)) return false;
+        if (head == nullptr) {
+            head = node;
+            tail = node;
+            return true;
+        }
+        node->next = head;
+        node->prev = nullptr;
+        head->prev = node;
+        head = node;
+        return true;
+    }
+    
+    ListNode* removeTail() {
+        if (head == tail) {
+            head = nullptr;
+            tail = nullptr;
+            return nullptr;
+        }
+        ListNode *node = tail;
+        tail = tail->prev;
+        tail->next = nullptr;
         return node;
     }
-
-    void deleteTail() {
-        if (tail->prev == head)
-        {
+    
+    /// map
+    void set(int key, int value) {
+         ListNode *node = maps[key];
+        if (node != nullptr) {
+            node->value = value;
+            toHead(node);
             return;
         }
-        LinklistNode *temp = tail->prev;
-        tail->prev = temp->prev;
-        temp->prev->next = tail;
-        temp->next = nullptr;
-        temp->prev = nullptr;
-        maps.erase(temp->key);
-        listCount--;
-    }
-
-    void updateNode(LinklistNode *node) {
-        if (node == nullptr || node == head || node == tail)
-        {
-            return;
+        while (list_length >= list_count) {
+            ListNode *rmNode = removeTail();
+            if (rmNode != nullptr) {
+                maps.erase(rmNode->key);
+                delete rmNode;
+                list_length--;
+            }
         }
-        node->next->prev = node->prev;
-        node->prev->next = node->next;
-        node->next = nullptr;
-        node->prev = nullptr;
-        /// 插入到头部
-        insertNode(node);
-        /// 只更新，不增加计数
-        listCount--;
+        node = new ListNode();
+        if (node == nullptr) return;
+        node->key = key;
+        node->value = value;
+        if (toHead(node)) {
+            maps[key] = node;
+        }
+        list_length++;
     }
-
-    unordered_map<int, LinklistNode *> maps;
+    
+    int get(int key) {
+        ListNode *node = maps[key];
+        if (node == nullptr) return -1;
+        toHead(node);
+        return node->value;
+    }
 public:
     /**
      * lru design
@@ -101,69 +126,25 @@ public:
      * @return int整型vector
      */
     vector<int> LRU(vector<vector<int> >& operators, int k) {
-        if (k<1)
-        {
-            return {};
-        }
-        
-        if (head == nullptr)
-        {
-            head = new LinklistNode(0,0);
-            tail = new LinklistNode(0,0);
-            head->next = tail;
-            tail->prev = head;
-        }
-        
         // write code here
+        if (k <= 0) return {};
+        list_count = k;
         vector<int> result;
-        // k 为 缓存大小
-        for (vector<vector<int> >::iterator itr = operators.begin(); itr != operators.end(); itr++)
-        {
-            vector<int> cur_op = *itr;
-            int key = cur_op[1];
-            if (cur_op[0] == 1)
-            { /// set
-                if (cur_op.size() < 3 )
-                {
-                    continue;
-                }
-                int value = cur_op[2];
-                if (maps.find(key) != maps.end())
-                {
-                    LinklistNode *node = maps[key];
-                    node->value = value;
-                    updateNode(node);
-                }
-                else
-                {
-                    if (listCount >= k)
-                    {
-                        deleteTail();
-                    }
-                    LinklistNode *node = insertValue(key, value);
-                    maps[key] = node;
-                }
-            }
-            else if (cur_op[0] == 2)
-            { /// get
-                if (cur_op.size() < 2 )
-                {
-                    continue;
-                }
-                if (maps.find(key) != maps.end())
-                {
-                    LinklistNode *node = maps[key];
-                    updateNode(node);
-                    result.push_back(node->value);
-                }
-                else
-                {
-                    maps.erase(key);   
-                    result.push_back(-1);
-                }
+        for (vector<vector<int> >::iterator itr = operators.begin(); itr != operators.end(); ++itr) {
+            vector<int> list = *itr;
+            int op = *(list.begin());
+            if (op == 1) {
+                /// set
+                set(list[1], list[2]);
+            } else if (op == 2) {
+                /// get
+                result.push_back(get(list[1]));
+            } else {
+                continue;
             }
         }
-       return result; 
+        maps.clear();
+        return result;
     }
 };
 
@@ -173,42 +154,63 @@ int main(int argc, const char * argv[]) {
     */
     // [[],[],[],[],[],[]]
     cout<<"Hello"<<endl;
-    /*
-    vector<vector<int>> ops{
-        {1,1,1},
-        {1,2,2},
-        {1,3,2},
-        {2,1},
-        {1,4,4},
-        {2,2},
-        };
-    */
     ///*
     vector<vector<int>> ops{
-        {1,-324690837,-72487934},
-        {1,-723504364,-369145172},
-        {2,-324690837},
-        {1,724101438,-30727452},
-        {1,366967562,290286156},
-        {2,366967562},
-        {1,-21417066,-450706222},
-        {1,-484359960,-121414361},
-        {1,-629538923,-759874959},
-        {1,-461538894,749719150},
-        {1,-338664886,-3080586},
-        {2,522415046},
-        {1,134352387,-391032350},
-        {1,283492390,210901529},
-        {2,-328994470},
-        {2,-254674447},
-        {2,85161833},
-        {1,36899859,-561167545},
-        {1,-232060336,889831435},
-        {1,-848557701,-189598178},
-        {2,-81051921},
-        {1,57162090,-193776405},
-        {1,157908494,-941008658},
-        {2,-21417066}
+        /// 测试用例1 -- 3
+        // {1,1,1},
+        // {1,2,2},
+        // {1,3,2},
+        // {2,1},
+        // {1,4,4},
+        // {2,2}
+
+        /// 测试用例2 -- 3
+        // {1,-324690837,-72487934},
+        // {1,-723504364,-369145172},
+        // {2,-324690837},
+        // {1,724101438,-30727452},
+        // {1,366967562,290286156},
+        // {2,366967562},
+        // {1,-21417066,-450706222},
+        // {1,-484359960,-121414361},
+        // {1,-629538923,-759874959},
+        // {1,-461538894,749719150},
+        // {1,-338664886,-3080586},
+        // {2,522415046},
+        // {1,134352387,-391032350},
+        // {1,283492390,210901529},
+        // {2,-328994470},
+        // {2,-254674447},
+        // {2,85161833},
+        // {1,36899859,-561167545},
+        // {1,-232060336,889831435},
+        // {1,-848557701,-189598178},
+        // {2,-81051921},
+        // {1,57162090,-193776405},
+        // {1,157908494,-941008658},
+        // {2,-21417066}
+
+        /// 测试用例3 --- 2
+        // {1,1,1},
+        // {1,2,2},
+        // {2,1},
+        // {1,3,3},
+        // {2,2},
+        // {1,4,4},
+        // {2,1},
+        // {2,3},
+        // {2,4}
+
+        /// 测试用例4 --- 3
+        {1,1,1},
+        {1,2,2},
+        {2,1},
+        {1,3,3},
+        {2,2},
+        {1,4,4},
+        {2,1},
+        {2,3},
+        {2,4}
     };
     //*/
     Solution s;

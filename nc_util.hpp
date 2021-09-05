@@ -12,6 +12,8 @@ struct TreeNode {
     TreeNode(int x) :
             val(x), left(nullptr), right(nullptr) {
     }
+    TreeNode() : val(0), left(nullptr), right(nullptr) {
+    }
     static TreeNode *tree(std::vector<std::string>& nodes);
 };
 
