@@ -27,7 +27,7 @@ private:
         int i = p + 1;
         int j = rhs;
         while (i < j) {
-            while (arr[i] < arr[p] && i <= rhs) i++;
+            while (arr[i] <= arr[p] && i <= rhs) i++;
             while (arr[j] > arr[p] && j  >= lhs) j--;
             if (i < j) swap(arr, i, j);
         }
