@@ -21,6 +21,8 @@ struct ListNode {
     int val;
     struct ListNode *next;
     ListNode(int x) : val(x), next(nullptr) {}
+    static ListNode *linklist(std::vector<int>& vals);
+    static void printlist(ListNode *node);
 };
 
 

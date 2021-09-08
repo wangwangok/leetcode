@@ -42,3 +42,32 @@ TreeNode* TreeNode::tree(std::vector<std::string>& nodes) {
     }
     return head;
 }
+
+ListNode *ListNode::linklist(std::vector<int>& vals) {
+    ListNode *head = nullptr, *lead = nullptr;
+    if (vals.size() <= 0) return head;
+    for (std::vector<int>::iterator itr = vals.begin(); itr != vals.end(); ++itr) {
+        ListNode *node = new ListNode(*itr);
+        if (head == nullptr) {
+            head = node;
+            lead = head;
+        } else {
+            lead->next = node;
+            lead = node;
+        }
+    }
+    return head;
+}
+
+void ListNode::printlist(ListNode *node) {
+    using namespace std;
+    if (node == nullptr) return;
+    cout<<endl;
+    cout<<"[";
+    while (node)
+    {
+        cout<<node->val<<" ";
+        node=node->next;
+    }
+    cout<<"]"<<endl;
+}
