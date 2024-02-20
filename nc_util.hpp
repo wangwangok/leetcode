@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 
+
 struct TreeNode {
     int val;
     struct TreeNode *left;
@@ -12,9 +13,12 @@ struct TreeNode {
     TreeNode(int x) :
             val(x), left(nullptr), right(nullptr) {
     }
-    TreeNode() : val(0), left(nullptr), right(nullptr) {
+    TreeNode() {
     }
-    static TreeNode *tree(std::vector<std::string>& nodes);
+    /**
+    * 如果需要传入空指针，传入-1即可
+    */
+    static void buildTree(std::vector<int>& nodes, TreeNode **root);
 };
 
 struct ListNode {
